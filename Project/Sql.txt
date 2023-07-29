@@ -1,0 +1,288 @@
+create table Covid19_Vaccine(
+Batch_no number(10),
+Import Date,
+Export Date,
+D_id number(10)
+)
+
+alter table Covid19_Vaccine add constraint CV1 primary key(Batch_no)
+
+alter table Covid19_Vaccine add constraint CV2 foreign key(D_id) references Defense_Personnel(D_id)
+
+insert into Covid19_Vaccine values(101,'05-JAN-21','10-JAN-21',208801)
+insert into Covid19_Vaccine values(102,'05-FEB-21','10-FEB-21',208802)
+insert into Covid19_Vaccine values(103,'05-MAR-21','10-MAR-21',208803)
+insert into Covid19_Vaccine values(104,'05-APR-21','10-APR-21',208804)
+
+select * from Covid19_Vaccine
+
+desc Covid19_Vaccine
+
+create table Batch(
+B_id number(10),
+Batch_no number(10),
+Code number(15)
+)
+
+alter table Batch add constraint B1 primary key(B_id)
+
+alter table Batch add constraint B2 foreign key(Batch_no) references Covid19_Vaccine(Batch_no)
+
+alter table Batch add constraint B3 foreign key(Code) references Hospital(Code)
+
+create sequence Batch_S
+start with 100
+increment by 10
+maxvalue 200
+nocycle
+nocache
+
+insert into Batch values(Batch_S.nextval,101,2200)
+insert into Batch values(Batch_S.nextval,103,2201)
+insert into Batch values(Batch_S.nextval,104,2202)
+insert into Batch values(Batch_S.nextval,102,2203)
+
+select * from Batch
+
+desc Batch
+
+create table Hospital(
+Code number(10),
+H_name varchar2(25),
+Location varchar2(25),
+Quarantine_Capacity number(5),
+Isolation_Capacity number(5),
+Available_Vaccine number(10)
+)
+
+alter table Hospital add constraint H1 primary key(Code)
+
+alter table Hospital modify Quarantine_Capacity default 200                                        [Default]
+
+alter table Hospital add constraint H2 Unique(H_name)                                              [Unique]
+
+insert into Hospital values(2200,'Lab Aid','Uttara',230,40,3000)
+insert into Hospital values(2201,'Square Hospital','Panthapath',250,50,4000)
+insert into Hospital values(2202,'Evercare Hospital','Bashundhara',280,60,5000)
+insert into Hospital(Code,H_name,Location,Isolation_Capacity,Available_Vaccine) values(2203,'United Hospital','Gulshan',50,4000)
+
+select * from Hospital 
+
+desc Hospital 
+
+
+create table Work(
+W_id number(10),
+Code number(15),
+ID number(10)
+)
+
+alter table Work add constraint W1 primary key(W_id)
+
+alter table Work add constraint W2 foreign key(Code) references Hospital(Code)
+
+alter table Work add constraint W3 foreign key(ID) references Doctor(ID)
+
+create sequence Work_S
+start with 1000
+increment by 5
+maxvalue 1050
+nocycle
+nocache
+
+insert into Work values(3000,2200,1000)
+insert into Work values(3050,2201,1005)
+insert into Work values(3100,2202,1010)
+insert into Work values(3150,2203,1015)
+
+select * from Work
+
+desc Work
+
+create table Doctor(
+ID number(10),
+D_name varchar2(20),
+DOB date,
+C_id number(10)
+)
+
+alter table Doctor add constraint D1 primary key(ID)
+
+alter table Doctor add constraint D2 foreign key(C_id) references Location(C_id)
+
+insert into Doctor values(1000,'Dr. Robert Adler','20-FEB-78',3166)
+insert into Doctor values(1005,'Dr. Ashok Rajgopal','14-JAN-65',9122)
+insert into Doctor values(1010,'Dr. M. Amjad Hossain','15-AUG-66',4205)
+insert into Doctor values(1015,'Dr. M. Mehdi Hasan','25-DEC-81',2202)
+
+select * from Doctor
+
+desc Doctor
+
+
+create table Location(
+C_id number(10),
+Country varchar2(20),
+City varchar2(25)
+)
+
+alter table Location add constraint L1 primary key(C_id)
+
+insert into Location values(3166,'United States','California')
+insert into Location values(9122,'India','Chennai')
+insert into Location values(4205,'Bangladesh','Dhaka')
+insert into Location values(2202,'Bangladesh','Mymensingh')
+
+select * from Location 
+
+desc Location
+
+create table Expert(
+ID number(10),
+Specialist varchar2(30)
+)
+
+alter table Expert add constraint E1 primary key(ID)
+
+insert into Expert values(2200,'Neurologist')
+insert into Expert values(2201,'Radiotherapist')
+insert into Expert values(2202,'Arthrologist')
+insert into Expert values(2203,'Cardiologist')
+
+select * from Expert
+
+desc Expert
+
+create table Identity(
+T_id number(10),
+ID number(10),
+NID number(25)
+)
+
+alter table Identity add constraint Id1 primary key(T_id)
+
+alter table Identity add constraint Id2 foreign key(ID) references Doctor(ID)
+
+alter table Identity add constraint Id3 foreign key(NID) references Patient(NID)
+
+insert into Identity values(100,1000,2610413928404)
+insert into Identity values(112,1005,2210413968409)
+insert into Identity values(115,1010,2410413968401)
+insert into Identity values(124,1015,2710453968400)
+
+select * from Identity 
+
+desc Identity 
+
+create table Patient(
+NID number(25),
+P_name varchar2(25),
+Gender varchar2(10),
+Blood_group varchar2(15),
+Covid19_Positive varchar2(10),
+GE_No number(15) 
+)
+
+alter table Patient add constraint PA1 primary key(NID)
+
+alter table Patient add constraint PA2 foreign key(GE_No) references Govt_Employee(GE_No)
+
+alter table Patient add constraint PA3 Check (Covid19_Positive='Y' Or Covid19_Positive='N')                [check]
+
+insert into Patient values(2610413928404,'Amit Hasan','Male','O-','Y',501)
+insert into Patient values(2210413968409,'Joy Kumar','Male','B+','N',502)
+insert into Patient values(2410413968401,'Sanzana Imam','Female','AB-','Y',503)
+insert into Patient values(2710453968400,'Tasnim Khan','Female','O+','N',504)
+
+select * from Patient 
+
+desc Patient
+
+create table Govt_Employee(
+GE_No number(15),
+GE_name varchar2(25),
+GE_job varchar2(30),
+Address varchar2(35),
+Designation varchar2(20),
+D_id number(10) 
+)
+
+alter table Govt_Employee add constraint GE1 primary key(GE_No)
+
+alter table Govt_Employee add constraint GE2 foreign key(D_id) references Defense_Personnel(D_id)
+
+alter table Govt_Employee modify (GE_name not null)                                                      [not null]
+
+insert into Govt_Employee values(501,'Rakibul','Home Ministry','Building #8,Bangladesh Secretariat','Assistant Director',208801)
+insert into Govt_Employee values(502,'Ezaz','Pollution Control Board','98 Kazi Nazrul Islam Ave','Sub Director',208802)
+insert into Govt_Employee values(503,'Sadikul','Anti Corruption Commission','Pioneer Rd, Dhaka 1205','Executive officer',208803)
+insert into Govt_Employee values(504,'Mahadi','Customs Bond Comissionarate','342, 1 Segun Bagicha Rd','Assistant Director',208804)
+
+select * from Govt_Employee
+
+desc Govt_Employee
+
+
+create table Contact(
+GE_No number(15),
+Phone number(20)
+)
+
+alter table Contact add constraint CO1 primary key(GE_No)
+
+insert into Contact values(501,01879194123)
+insert into Contact values(502,01795825950)
+insert into Contact values(503,01787396105)
+insert into Contact values(504,01392402780)
+
+select * from Contact 
+
+desc Contact 
+
+create table Defense_Personnel(
+D_id number(10),
+DP_name varchar2(20),
+DP_job varchar2(20),
+Rank varchar2(25)
+)
+
+alter table Defense_Personnel add constraint DP1 primary key(D_id)
+
+create sequence Defense_Personnel_S
+start with 208801
+increment by 1
+maxvalue 208810
+nocycle
+nocache
+
+insert into Defense_Personnel values(Defense_Personnel_S.nextval,'Hasnat','Police','Sub-Inspector')
+insert into Defense_Personnel values(Defense_Personnel_S.nextval,'Kabir','Army','Sergeant')
+insert into Defense_Personnel values(Defense_Personnel_S.nextval,'Jamil','BGB','Lieutenant')
+insert into Defense_Personnel values(Defense_Personnel_S.nextval,'Karim','RAB','Captain')
+
+select * from Defense_Personnel
+
+desc Defense_Personnel
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
